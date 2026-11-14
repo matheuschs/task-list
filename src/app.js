@@ -13,20 +13,13 @@ const app = express();
 
 app.use(express.json());
 
-const tasks = [
-    {
-        id: 1,
-        title: 'study Node.js',
-        description: 'learn express from api',
-        completed: false
-    }
-];
+app.get("/tasks", async (req, res) => {
+    const result = await pool.query(`SELECT * FROM tasks`);
 
-app.get("/tasks", (req, res) => {
-    res.json(tasks);
+    res.json(result.rows);
 });
 
-app.get("/tasks/:id", (req, res) => {
+app.get("/tasks/:id", async (req, res) => {
     const id = Number(req.params.id);
 
     const search = tasks.find(task => task.id === id);
@@ -37,42 +30,45 @@ app.get("/tasks/:id", (req, res) => {
         });
     };
 
-    res.json(search);
+    const result = await pool.query(`SELECT * FROM tasks WHERE id = $1`, [id]);
+
+    res.json(result.rows[0]);
 });
 
-app.post("/tasks", (req, res) => {
+app.post("/tasks", async (req, res) => {
     const { title, description } = req.body;
 
-    const newTask = {
-        id: tasks.length + 1,
-        title,
-        description,
-        completed: false
-    };
+    const result = await pool.query(
+        `INSERT INTO tasks (title, description)
+        VALUES ($1, $2)
+        RETURNING *`, 
+        [title, description]
+    );
 
-    tasks.push(newTask);
+    res.status(201).json(result.rows[0]);
 
-    res.status(201).json(newTask);
 });
 
-app.patch("/tasks/:id", (req, res) => {
+app.patch("/tasks/:id", async (req, res) => {
     const id = Number(req.params.id);
     const { completed } = req.body;
-    const search = tasks.find(tasks => tasks.id === id);
 
-    if(!search){
+    const result = await pool.query(
+        `UPDATE tasks
+        SET completed = $1
+        WHERE id = $2
+        RETURNING *`,
+        [completed, id]
+    );
+
+    if(result.rows.length === 0){
         res.status(404).json({
             message: "task not found"
         });
-    };
+    }
 
-    if(search.completed === false){
-        search.completed = true;    
-    }else{
-        search.completed = false;
-    };
+    res.json(result.rows[0]);
 
-    res.json(search);
 });
 
 app.delete("/tasks/:id", (req, res) => {
