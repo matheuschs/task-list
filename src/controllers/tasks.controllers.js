@@ -1,11 +1,11 @@
 import { pool } from "../db/server.js";
+import tasksServices from "../services/tasks.services.js";
 
 async function getTasks (req, res, next) {
     try {
-        const result = await pool.query(`SELECT * FROM tasks`);  
+        const task = await tasksServices.getTasks();
         
-        res.json(result.rows);
-
+        res.json(task);
     } catch (error) {
         next(error);
     };
@@ -21,9 +21,9 @@ async function getTaskById (req, res, next) {
             });
         };
 
-        const result = await pool.query(`SELECT * FROM tasks WHERE id = $1`, [id]);
+        const task = await tasksServices.getTaskById(id);
 
-        res.json(result.rows[0]);
+        res.json(task);
         
     } catch (error) {
         next(error);
