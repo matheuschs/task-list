@@ -13,104 +13,130 @@ const app = express();
 
 app.use(express.json());
 
-app.get("/tasks", async (req, res) => {
-    const result = await pool.query(`SELECT * FROM tasks`);
+app.get("/tasks", async (req, res, next) => {
+    try{
+        const result = await pool.query(`SELECT * FROM tasks`);
 
-    res.json(result.rows);
+        res.json(result.rows);
+    }catch(error){
+        next(error)
+    };
 });
 
-app.get("/tasks/:id", async (req, res) => {
-    const id = Number(req.params.id);
+app.get("/tasks/:id", async (req, res, next) => {
+    try {
+        const id = Number(req.params.id);
 
-    const search = tasks.find(task => task.id === id);
+        const search = tasks.find(task => task.id === id);
 
-    if(!search){
-        res.status(404).json({
-            message: "task not found"
-        });
+        if(!search){
+            res.status(404).json({
+                message: "task not found"
+            });
+        };
+
+        const result = await pool.query(`SELECT * FROM tasks WHERE id = $1`, [id]);
+
+        res.json(result.rows[0]);        
+    } catch (error) {
+        next(error)
     };
-
-    const result = await pool.query(`SELECT * FROM tasks WHERE id = $1`, [id]);
-
-    res.json(result.rows[0]);
 });
 
-app.post("/tasks", async (req, res) => {
-    const { title, description, completed } = req.body;
+app.post("/tasks", async (req, res, next) => {
+    try {
+        const { title, description, completed } = req.body;
 
-    if(title === ""){
-        return res.status(400).json({
-            message: "title don't can be empty"
-        });
+        if(title === ""){
+            return res.status(400).json({
+                message: "title don't can be empty"
+            });
+        };
+
+        if(completed === undefined){
+            return res.status(400).json({
+                message: "completed is required"
+            });
+        };
+
+        const result = await pool.query(
+            `INSERT INTO tasks (title, description)
+            VALUES ($1, $2)
+            RETURNING *`, 
+            [title, description]
+        );
+
+        res.status(201).json(result.rows[0]);        
+    } catch (error) {
+        next(error);  
     };
-
-    if(completed === undefined){
-        return res.status(400).json({
-            message: "completed is required"
-        });
-    };
-
-    const result = await pool.query(
-        `INSERT INTO tasks (title, description)
-        VALUES ($1, $2)
-        RETURNING *`, 
-        [title, description]
-    );
-
-    res.status(201).json(result.rows[0]);
-
 });
 
-app.patch("/tasks/:id", async (req, res) => {
-    const id = Number(req.params.id);
-    const { completed } = req.body;
+app.patch("/tasks/:id", async (req, res, next) => {
+    try {
+        const id = Number(req.params.id);
+        const { completed } = req.body;
 
-    if(isNaN(id)){
-        return res.json(400).json({
-            message: "id must be a number"
-        });
+        if(isNaN(id)){
+            return res.json(400).json({
+                message: "id must be a number"
+            });
+        };
+
+        if(typeof completed !== "boolean"){
+            return res.status(400).json({
+                message: "completed must be a boolean"
+            });
+        };
+
+        const result = await pool.query(
+            `UPDATE tasks
+            SET completed = $1
+            WHERE id = $2
+            RETURNING *`,
+            [completed, id]
+        );
+
+        if(result.rows.length === 0){
+            return res.status(404).json({
+                message: "task not found"
+            });
+        }
+
+        res.json(result.rows[0]);        
+    } catch (error) {
+        next(error)
     };
-
-    if(typeof completed !== "boolean"){
-        return res.status(400).json({
-            message: "completed must be a boolean"
-        });
-    };
-
-    const result = await pool.query(
-        `UPDATE tasks
-        SET completed = $1
-        WHERE id = $2
-        RETURNING *`,
-        [completed, id]
-    );
-
-    if(result.rows.length === 0){
-        return res.status(404).json({
-            message: "task not found"
-        });
-    }
-
-    res.json(result.rows[0]);
-
 });
 
-app.delete("/tasks/:id", async (req, res) => {
-    const id = Number(req.params.id);
+app.delete("/tasks/:id", async (req, res, next) => {
+    try {
+        const id = Number(req.params.id);
 
-    const result = await pool.query(`DELETE FROM tasks WHERE id = $1 RETURNING *`, [id]);
+        const result = await pool.query(`DELETE FROM tasks WHERE id = $1 RETURNING *`, [id]);
 
-    if(result.rows.length === 0){
-        res.status(404).json({
-            message: "task not found"
-        });
+        if(result.rows.length === 0){
+            res.status(404).json({
+                message: "task not found"
+            });
+        };
+
+        res.json({
+            message: "task deleted sucessfully",
+            task: result.rows[0]
+        });        
+    } catch (error) {
+        next(error)
     };
+});
 
-    res.json({
-        message: "task deleted sucessfully",
-        task: result.rows[0]
+app.use((err, req, res, next) => {
+    console.error(err);
+
+    res.status(500).json({
+        message: "internal server error"
     });
-});
+})
 
 app.listen(3000, () => {
     console.log("O servidor está rodando a porta 3000");
