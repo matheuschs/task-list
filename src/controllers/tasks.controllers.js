@@ -40,16 +40,11 @@ async function createTask (req, res, next) {
             });
         };
 
-        const result = await pool.query(`
-            INSERT INTO tasks (title, description)
-            VALUES($1, $2)
-            RETURNING *`,
-            [title, description]
-        );
+        const task = tasksServices.createTask(title, description);
 
         res.status(201).json({
             message: "task created",
-            task: result.rows[0]
+            task: task
         });
 
     } catch (error) {
@@ -74,17 +69,11 @@ async function updateTask (req, res, next) {
             });
         };
 
-        const result = await pool.query(`
-            UPDATE tasks
-            SET completed = $1
-            WHERE id = $2
-            RETURNING *`,
-            [completed, id]
-        );
+        const task = tasksServices.updateTask(id, completed);
 
         res.status(200).json({
             message: "task modified",
-            task: result.rows[0]
+            task: task
         });
         
     } catch (error) {
@@ -102,12 +91,7 @@ async function deleteTask (req, res, next) {
             });
         };
 
-        const result = await pool.query(`
-            DELETE FROM tasks
-            WHERE id = $1
-            RETURNING *`,
-            [id]
-        );
+        const task = tasksServices.deleteTask(id);
 
         if (result.rows.length === 0) {
             return res.status(404).json({
@@ -117,7 +101,7 @@ async function deleteTask (req, res, next) {
 
         res.json({
             message: "task deleted",
-            task: result.rows[0]
+            task: task
         });
 
     } catch (error) {
