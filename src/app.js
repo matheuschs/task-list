@@ -36,7 +36,19 @@ app.get("/tasks/:id", async (req, res) => {
 });
 
 app.post("/tasks", async (req, res) => {
-    const { title, description } = req.body;
+    const { title, description, completed } = req.body;
+
+    if(title === ""){
+        return res.status(400).json({
+            message: "title don't can be empty"
+        });
+    };
+
+    if(completed === undefined){
+        return res.status(400).json({
+            message: "completed is required"
+        });
+    };
 
     const result = await pool.query(
         `INSERT INTO tasks (title, description)
@@ -52,6 +64,18 @@ app.post("/tasks", async (req, res) => {
 app.patch("/tasks/:id", async (req, res) => {
     const id = Number(req.params.id);
     const { completed } = req.body;
+
+    if(isNaN(id)){
+        return res.json(400).json({
+            message: "id must be a number"
+        });
+    };
+
+    if(typeof completed !== "boolean"){
+        return res.status(400).json({
+            message: "completed must be a boolean"
+        });
+    };
 
     const result = await pool.query(
         `UPDATE tasks
