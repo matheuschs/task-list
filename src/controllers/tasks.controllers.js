@@ -51,7 +51,7 @@ async function updateTask (req, res, next) {
 
         res.status(200).json({
             message: "task modified",
-            task: task
+            task
         });
         
     } catch (error) {
@@ -67,7 +67,7 @@ async function deleteTask (req, res, next) {
 
         res.json({
             message: "task deleted",
-            task: task
+            task
         });
 
     } catch (error) {

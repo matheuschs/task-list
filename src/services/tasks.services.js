@@ -27,7 +27,8 @@ async function updateTask (id, completed) {
     const result = await pool.query(
         `UPDATE tasks 
         SET completed = $1 
-        WHERE id = $2`, 
+        WHERE id = $2
+        RETURNING *`, 
         [completed, id]
     );
 
@@ -35,7 +36,7 @@ async function updateTask (id, completed) {
 };
 
 async function deleteTask (id) {
-    const result = await pool.query("DELETE FROM tasks WHERE id = $1", [id]);
+    const result = await pool.query("DELETE FROM tasks WHERE id = $1 RETURNING *", [id]);
 
     return result.rows[0];
 };
