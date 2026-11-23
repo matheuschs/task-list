@@ -1,7 +1,12 @@
 import express from "express";
+//import swaggerUi from "swagger-ui-express";
+//import YAML from "yamljs";
 
 const app = express();
 app.use(express.json());
+
+//const swaggerDocument = YAML.load("./src/docs/swagger.yaml");
+//app.use("/swagger", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 import tasksRouter from "./routes/tasks.routes.js";
 
