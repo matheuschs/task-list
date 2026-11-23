@@ -4,7 +4,10 @@ async function getTasks (req, res, next) {
     try {
         const task = await tasksServices.getTasks();
         
-        res.json(task);
+        res.json({
+            data: task
+        });
+
     } catch (error) {
         next(error);
     };
@@ -16,7 +19,9 @@ async function getTaskById (req, res, next) {
 
         const task = await tasksServices.getTaskById(id);
 
-        res.json(task);
+        res.json({
+            data: task
+        });
         
     } catch (error) {
         next(error);
@@ -35,7 +40,10 @@ async function createTask (req, res, next) {
             });
         };
 
-        res.json(task);
+        res.json({
+            message: "task create suscesfully",
+            data: task
+        });
 
     } catch (error) {
         next(error);
@@ -51,7 +59,7 @@ async function updateTask (req, res, next) {
 
         res.status(200).json({
             message: "task modified",
-            task
+            data: task
         });
         
     } catch (error) {
@@ -67,7 +75,7 @@ async function deleteTask (req, res, next) {
 
         res.json({
             message: "task deleted",
-            task
+            data: task
         });
 
     } catch (error) {

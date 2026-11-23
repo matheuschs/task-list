@@ -1,9 +1,11 @@
 import express from "express";
+import cors from "cors";
 //import swaggerUi from "swagger-ui-express";
 //import YAML from "yamljs";
 
 const app = express();
 app.use(express.json());
+app.use(cors());
 
 //const swaggerDocument = YAML.load("./src/docs/swagger.yaml");
 //app.use("/swagger", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
