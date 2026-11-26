@@ -32,7 +32,7 @@ header{
     border-radius: 5%;
 }
 
-.buttons{
+.task-form{
     display: flex;
     flex-direction: column;
     gap: 0.2rem;

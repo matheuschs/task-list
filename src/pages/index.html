@@ -3,22 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TASK-LIST</title>
+    <title>TASK LIST</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <header>
-        <h1>TASK-LIST</h1>
+        <h1>TASK LIST</h1>
     </header>
     <section>
         <div class="container">
-            <div class="buttons">
+            <form class="task-form">
                 <input type="text" id="task-name" placeholder="what do you have to do?">
                 <input type="text" id="task-description" placeholder="description">
-                <button type="button">Add task</button>
-            </div>
+                <button type="button" onclick="createTask()">Add task</button>
+            </form>
             <div class="tasks">
-                <li class="task-list"></li>
+                <ul class="task-list"></ul>
             </div>
         </div>
     </section>
