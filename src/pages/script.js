@@ -13,8 +13,9 @@ async function loadTasks () {
             tasks.forEach((task) => {
                 const li = document.createElement("li");
                 li.innerHTML = `
-                    <h4>${task.title}</h4>
+                    <h4 onclick = "completeTask()" >title: ${task.title}</h4>
                     <p>${task.description ?? ""}</p>
+                    <hr>
                 `;
                 taskList.appendChild(li);
             });  
@@ -25,5 +26,6 @@ async function loadTasks () {
         console.error("Error getting tasks", erro);
     };
 };
+
 
 loadTasks();
