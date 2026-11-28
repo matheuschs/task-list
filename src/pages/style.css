@@ -13,17 +13,18 @@ body{
     justify-content: center;
     align-items: center;
     flex-direction: column;
-    height: 500px;
+    min-height: 500px;
     gap: 1rem;
+    padding: 1rem;
 }
 
 header{
-    height: 50px;
+    min-height: 20px;
 }
 
 .container{
     background: #ddd;
-    height: 400px;
+    min-height: 400px;
     width: 400px;
     display: flex;
     justify-content: center;
@@ -45,6 +46,8 @@ header{
 .task-list{
     list-style: none;
     padding-left: 0;
+    max-height: 300px;
+    overflow: auto;
 }
 
 li {
